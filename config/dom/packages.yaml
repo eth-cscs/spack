@@ -1,0 +1,15 @@
+packages:
+  all:
+    target: [haswell]
+    compiler: [gcc, clang]
+    providers:
+      blas: [openblas]
+      lapack: [openblas]
+      mpi: [cray-mpich, openmpi]
+      scalapack: [netlib-scalapack]
+  cray-mpich:
+    buildable: false
+    externals:
+    - spec: cray-mpich@7.7.17
+      modules:
+      - cray-mpich/7.7.17

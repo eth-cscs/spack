@@ -1,0 +1,7 @@
+spack:
+  view: false
+  concretization: separately
+  specs:
+  - gromacs
+  - sirius
+  - hpx
