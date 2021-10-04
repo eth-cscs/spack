@@ -1,0 +1,7 @@
+./bin
+./.spack-db/failures
+./.spack-db/index_verifier
+./.spack-db/lock
+./.spack-db/prefix_failures
+./.spack-db/prefix_lock
+.wh.*

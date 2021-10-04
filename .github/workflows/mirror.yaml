@@ -1,0 +1,26 @@
+name: mirror
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_commit:
+        description: 'Spack commit SHA'
+        required: true
+
+jobs:
+  bump_develop:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Make checkout actions setup auth
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+          ref: cscs/main
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Bump develop branch
+        run: |
+          git fetch https://github.com/spack/spack.git "${{ github.event.inputs.upstream_commit }}"
+          git push origin "${{ github.event.inputs.upstream_commit }}:refs/heads/develop"

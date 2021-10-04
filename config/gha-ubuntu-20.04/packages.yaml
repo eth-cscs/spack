@@ -1,0 +1,9 @@
+packages:
+  all:
+    target: [x86_64]
+    compiler: [gcc, clang]
+    providers:
+      blas: [openblas]
+      lapack: [openblas]
+      mpi: [mpich]
+      scalapack: [netlib-scalapack]

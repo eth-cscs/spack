@@ -1,0 +1,12 @@
+spack:
+  view: false
+  concretization: separately
+  specs:
+  - gromacs
+  - pika
+  - sirius
+  packages:
+    llvm:
+      variants: ~clang~libcxx~lldb~lld~compiler-rt~polly
+    libgit2:
+      variants: ~mmap

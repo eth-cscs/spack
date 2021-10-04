@@ -1,0 +1,4 @@
+/deps
+/spack.lock
+/spack.yaml
+/.spack
