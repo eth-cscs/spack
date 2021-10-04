@@ -1,0 +1,44 @@
+From c9e77ec5b22883ee74dcb284abeb47a00a92e8d0 Mon Sep 17 00:00:00 2001
+From: Harmen Stoppels <harmenstoppels@gmail.com>
+Date: Mon, 25 Oct 2021 15:38:07 +0200
+Subject: [PATCH] bring back SPACK_OPTIMIZATION_FLAGS
+
+---
+ lib/spack/env/cc | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/lib/spack/env/cc b/lib/spack/env/cc
+index c498db0583..c5808cb895 100755
+--- a/lib/spack/env/cc
++++ b/lib/spack/env/cc
+@@ -547,6 +547,12 @@ while [ $# -ne 0 ]; do
+                 append other_args_list "$1"
+             fi
+             ;;
++        -O0|-O|-O1|-O2|-O3|-Os|-Ofast|-Og|-g)
++            # drop -O* and -g flags when SPACK_OPTIMIZATION_FLAGS is set
++            if [ -z "$SPACK_OPTIMIZATION_FLAGS" ]; then
++                append other_args_list "$1"
++            fi
++            ;;
+         *)
+             if [ "$1" = "$dtags_to_strip" ]; then
+                 :  # We want to remove explicitly this flag
+@@ -567,6 +573,14 @@ while [ $# -ne 0 ]; do
+     shift
+ done
+ 
++case "$mode" in
++    cc|ccld)
++        if [ -n "$SPACK_OPTIMIZATION_FLAGS" ]; then
++            append other_args_list "$SPACK_OPTIMIZATION_FLAGS"
++        fi
++        ;;
++esac
++
+ #
+ # Add flags from Spack's cppflags, cflags, cxxflags, fcflags, fflags, and
+ # ldflags. We stick to the order that gmake puts the flags in by default.
+-- 
+2.25.1
+
