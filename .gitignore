@@ -1,3 +1,6 @@
 .spack-env/
 bad_sha
 good_sha
+env.diff
+**/__pycache__
+generated-configs/
