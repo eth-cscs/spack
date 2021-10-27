@@ -1,7 +1,5 @@
 spack:
   include:
-  - ${SPACK_SYSTEM_CONFIG_PATH}/packages.yaml
-  - ${SPACK_SYSTEM_CONFIG_PATH}/compilers.yaml
   view: false
   concretization: separately
   specs:

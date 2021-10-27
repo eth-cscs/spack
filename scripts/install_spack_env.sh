@@ -33,8 +33,15 @@ mkdir -p "$store_dir"
 
 printf "⏳ Going to install %b in %b\n" "${bold_cyan}$env_dir${no_color}" "${bold_cyan}$store_dir${no_color}"
 
-printf '👉 Removing ~/.spack\n'
-rm -rf ~/.spack
+if [ -d "$SPACK_USER_CONFIG_DIR" ]; then
+    printf '👉 Removing %s\n' "$SPACK_USER_CONFIG_DIR"
+    rm -rf "$SPACK_USER_CONFIG_DIR"
+fi
+
+if [ -d "$SPACK_USER_CACHE_DIR" ]; then
+    printf '👉 Removing %s\n' "$SPACK_USER_CACHE_DIR"
+    rm -rf "$SPACK_USER_CACHE_DIR"
+fi
 
 printf '👉 Cleaning: spack -e "%s" clean -sfmpb\n' "$env_dir"
 spack -e "$env_dir" clean -sfmpb

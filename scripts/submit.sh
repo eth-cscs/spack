@@ -21,18 +21,21 @@ else
     report="no"
 fi
 
-# This is a terrible hack until https://github.com/spack/spack/pull/26735 lands.
-export HOME="$root/home"
-rm -rf "$HOME"
-
+# Make our shell scripts available
 export PATH="$root/scripts/:$PATH"
-export SPACK_SYSTEM_CONFIG_PATH="$root/config/dom"
 
-printf "Install dir:      %b\n" "${bold_cyan}${store_dir}${no_color}"
-printf "Home dir:         %b\n" "${bold_cyan}${HOME}${no_color}"
-printf "Environment:      %b\n" "${bold_cyan}${environment}${no_color}"
-printf "Config:           %b\n" "${bold_cyan}${SPACK_SYSTEM_CONFIG_PATH}${no_color}"
-printf "Report to Github: %b\n" "${bold_cyan}${report}${no_color}"
+# Configure Spack to use config and cache inside of the current dir.
+export SPACK_SYSTEM_CONFIG_PATH="$root/config/dom"
+export SPACK_USER_CONFIG_PATH="$root/spack_user_config"
+export SPACK_USER_CACHE_PATH="$root/spack_user_cache"
+
+printf "Install dir:        %b\n" "${bold_cyan}${store_dir}${no_color}"
+printf "Home dir:           %b\n" "${bold_cyan}${HOME}${no_color}"
+printf "Environment:        %b\n" "${bold_cyan}${environment}${no_color}"
+printf "System config path: %b\n" "${bold_cyan}${SPACK_SYSTEM_CONFIG_PATH}${no_color}"
+printf "User config path:   %b\n" "${bold_cyan}${SPACK_USER_CONFIG_PATH}${no_color}"
+printf "User cache path:    %b\n" "${bold_cyan}${SPACK_USER_CACHE_PATH}${no_color}"
+printf "Report to Github:   %b\n" "${bold_cyan}${report}${no_color}"
 
 # Find the working spack
 find_the_latest_working_spack.sh "$environment" "$store_dir"

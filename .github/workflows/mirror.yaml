@@ -10,9 +10,6 @@ on:
 jobs:
   bump_develop:
     runs-on: ubuntu-20.04
-    env:
-      SPACK_COLOR: always
-      SPACK_SYSTEM_CONFIG_PATH: ${{ github.workspace }}/config/gha-ubuntu-20.04
 
     steps:
       - name: Configure git
