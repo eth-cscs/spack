@@ -7,37 +7,21 @@ on:
         description: 'Spack commit SHA'
         required: true
 
+permissions:
+  contents: write
+
 jobs:
   bump_develop:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Configure git
-        run: |
-          git config --global user.name 'Harmen Stoppels'
-          git config --global user.email 'haampie@users.noreply.github.com'
-
-      - name: Checkout the cscs/main branch
+      - name: Make checkout actions setup auth
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
         with:
           ref: cscs/main
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-          persist-credentials: true
+          fetch-depth: 1
 
-      - name: Checkout upstream Spack develop
-        uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
-        with:
-          repository: spack/spack
-          ref: develop
-          fetch-depth: 0
-          path: ./upstream-spack
-          persist-credentials: false
-
-      - name: Checkout the provided commit
-        run: git -C upstream-spack reset --hard "${{ github.event.inputs.upstream_commit }}"
-
-      - name: Mirror upstream develop branch
+      - name: Bump develop branch
         run: |
-          git remote add upstream ./upstream-spack
-          git fetch upstream develop
-          git push origin upstream/develop:develop
+          git fetch https://github.com/spack/spack.git "${{ github.event.inputs.upstream_commit }}"
+          git push origin "${{ github.event.inputs.upstream_commit }}:refs/heads/develop"
