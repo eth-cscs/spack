@@ -11,6 +11,8 @@ no_color='\e[0m'
 
 set -e
 
+root="$(dirname "$(dirname "$(readlink -f "$0")")")"
+
 if [ ! -d "$1" ] || [ -z "$2" ]; then
     echo "Usage: $0 path/to/env/dir path/to/install/dir"
     exit 1
@@ -42,6 +44,11 @@ git clone --quiet --branch develop -c feature.manyFiles=true https://github.com/
 # Get the full commit SHA's.
 fork_commit="$(git -C ./fork-spack rev-parse HEAD)"
 upstream_commit="$(git -C ./upstream-spack rev-parse HEAD)"
+
+# Just apply the amazing Spack compiler wrapper patch, usually when bisecting
+# this should just remain here, as long as it's not conflicting.
+git -c color.ui=always -C ./fork-spack apply "$root/patches/SPACK_OPTIMIZATION_FLAGS.patch"
+git -c color.ui=always -C ./upstream-spack apply "$root/patches/SPACK_OPTIMIZATION_FLAGS.patch"
 
 printf "✨ Spack bump: %b ↑ %b.\n" "${bold_cyan}${fork_commit}${no_color}" "${bold_green}${upstream_commit}${no_color}"
 
