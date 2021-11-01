@@ -7,9 +7,6 @@ on:
         description: 'Spack commit SHA'
         required: true
 
-permissions:
-  contents: write
-
 jobs:
   bump_develop:
     runs-on: ubuntu-20.04
@@ -18,8 +15,10 @@ jobs:
       - name: Make checkout actions setup auth
         uses: actions/checkout@1e204e9a9253d643386038d443f96446fa156a97
         with:
-          ref: cscs/main
           fetch-depth: 1
+          persist-credentials: true
+          ref: cscs/main
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Bump develop branch
         run: |
