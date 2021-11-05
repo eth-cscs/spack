@@ -1,16 +1,16 @@
-From 80902d0b40dff7261ae589ada90a9ad6f1ce617b Mon Sep 17 00:00:00 2001
+From 6f9078174996ebb6d2a96cc3ac7b833636008b9f Mon Sep 17 00:00:00 2001
 From: Harmen Stoppels <harmenstoppels@gmail.com>
 Date: Mon, 4 Oct 2021 15:48:39 +0200
 Subject: [PATCH] spack diff two environment lock files
 
 ---
- lib/spack/spack/cmd/diff.py       | 93 ++++++++++++++++++++-----------
- lib/spack/spack/test/cmd/diff.py  | 27 ++++++++-
+ lib/spack/spack/cmd/diff.py       | 95 +++++++++++++++++++++----------
+ lib/spack/spack/test/cmd/diff.py  | 28 ++++++++-
  share/spack/spack-completion.bash |  2 +-
- 3 files changed, 88 insertions(+), 34 deletions(-)
+ 3 files changed, 90 insertions(+), 35 deletions(-)
 
 diff --git a/lib/spack/spack/cmd/diff.py b/lib/spack/spack/cmd/diff.py
-index 85b73b6545ca..3db218e68855 100644
+index 8d7b99e83475..8e69087fb356 100644
 --- a/lib/spack/spack/cmd/diff.py
 +++ b/lib/spack/spack/cmd/diff.py
 @@ -4,26 +4,29 @@
@@ -47,7 +47,7 @@ index 85b73b6545ca..3db218e68855 100644
  
      subparser.add_argument(
          '--json',
-@@ -57,37 +60,34 @@ def compare_specs(a, b, to_string=False, color=None):
+@@ -57,37 +60,36 @@ def compare_specs(a, b, to_string=False, color=None):
      Arguments:
          a (spack.spec.Spec): the first spec to compare
          b (spack.spec.Spec): the second spec to compare
@@ -62,16 +62,18 @@ index 85b73b6545ca..3db218e68855 100644
      # Prepare a solver setup to parse differences
      setup = asp.SpackSolverSetup()
  
--    a_facts = set(t for t in setup.spec_clauses(a, body=True))
--    b_facts = set(t for t in setup.spec_clauses(b, body=True))
+-    a_facts = set(t for t in setup.spec_clauses(a, body=True, expand_hashes=True))
+-    b_facts = set(t for t in setup.spec_clauses(b, body=True, expand_hashes=True))
 +    a = [a] if isinstance(a, spack.spec.Spec) else a
 +    b = [b] if isinstance(b, spack.spec.Spec) else b
 +
 +    a_facts, b_facts = [], []
 +    for s in a:
-+        a_facts.extend(setup.spec_clauses(s, body=True, transitive=True))
++        a_facts.extend(
++            setup.spec_clauses(s, body=True, transitive=True, expand_hashes=True))
 +    for s in b:
-+        b_facts.extend(setup.spec_clauses(s, body=True, transitive=True))
++        b_facts.extend(
++            setup.spec_clauses(s, body=True, transitive=True, expand_hashes=True))
 +
 +    a_facts = set(a_facts)
 +    b_facts = set(b_facts)
@@ -96,7 +98,7 @@ index 85b73b6545ca..3db218e68855 100644
      }
  
  
-@@ -117,9 +117,6 @@ def print_difference(c, attributes="all", out=None):
+@@ -117,9 +119,6 @@ def print_difference(c, attributes="all", out=None):
      A = c['b_not_a']
      B = c['a_not_b']
  
@@ -106,7 +108,7 @@ index 85b73b6545ca..3db218e68855 100644
      # Cut out early if we don't have any differences!
      if not A and not B:
          print("No differences\n")
-@@ -174,24 +171,58 @@ def group_by_type(diffset):
+@@ -174,24 +173,58 @@ def group_by_type(diffset):
              cprint("@G{+  %s}" % addition.pop(0))
  
  
@@ -176,7 +178,7 @@ index 85b73b6545ca..3db218e68855 100644
 +
 +    print_difference(c, attributes)
 diff --git a/lib/spack/spack/test/cmd/diff.py b/lib/spack/spack/test/cmd/diff.py
-index 9049b3f11b02..136ee7e134f3 100644
+index 48435df2a620..0704ceb065bd 100644
 --- a/lib/spack/spack/test/cmd/diff.py
 +++ b/lib/spack/spack/test/cmd/diff.py
 @@ -3,11 +3,15 @@
@@ -195,19 +197,20 @@ index 9049b3f11b02..136ee7e134f3 100644
  import spack.store
  import spack.util.spack_json as sjson
  
-@@ -56,8 +60,6 @@ def test_load_first(install_mockery, mock_fetch, mock_archive, mock_packages):
-     assert len(result['a_not_b']) == 0
-     assert len(result['b_not_a']) == 0
+@@ -64,9 +68,6 @@ def test_load_first(install_mockery, mock_fetch, mock_archive, mock_packages):
+     assert not result['a_not_b']
+     assert not result['b_not_a']
  
 -    assert 'mpileaks' in result['a_name']
 -    assert 'mpileaks' in result['b_name']
-     assert "intersect" in result and len(result['intersect']) > 50
+-
+     # spot check attributes in the intersection to ensure they describe the spec
+     assert "intersect" in result
+     assert all(["node", dep] in result["intersect"] for dep in (
+@@ -110,3 +111,24 @@ def test_load_first(install_mockery, mock_fetch, mock_archive, mock_packages):
  
-     # After we install another version, it should ask us to disambiguate
-@@ -83,3 +85,24 @@ def test_load_first(install_mockery, mock_fetch, mock_archive, mock_packages):
-     assert len(result['b_not_a']) == 1
-     assert result['a_not_b'][0] == ['variant_value', 'mpileaks debug True']
-     assert result['b_not_a'][0] == ['variant_value', 'mpileaks debug False']
+     assert ['hash', 'mpileaks %s' % no_debug_hash] in result['b_not_a']
+     assert ['variant_value', 'mpileaks debug False'] in result['b_not_a']
 +
 +
 +def test_environment_lock_files(tmpdir, mock_packages, config):
@@ -230,10 +233,10 @@ index 9049b3f11b02..136ee7e134f3 100644
 +    assert '-  zlib 1.2.11' in out
 +    assert '+  zlib 1.2.8' in out
 diff --git a/share/spack/spack-completion.bash b/share/spack/spack-completion.bash
-index 131deade0b58..9f40dff88182 100755
+index e9022d47bbde..bf01b4ee1746 100755
 --- a/share/spack/spack-completion.bash
 +++ b/share/spack/spack-completion.bash
-@@ -882,7 +882,7 @@ _spack_diff() {
+@@ -886,7 +886,7 @@ _spack_diff() {
      then
          SPACK_COMPREPLY="-h --help --json --first -a --attribute"
      else
