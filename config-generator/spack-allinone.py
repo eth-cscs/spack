@@ -260,7 +260,7 @@ if __name__ == "__main__":
         cpe_pkgs.extend(cpe._generate_packages())
 
         cpe_configs_path = Path(f"./generated-configs/{cpe}")
-        cpe_configs_path.mkdir(parents=True)
+        cpe_configs_path.mkdir(parents=True, exist_ok=True)
 
         with open(cpe_configs_path / "packages.yaml", "w") as yaml_file:
             syaml.dump_config(to_config_data(cpe_pkgs), yaml_file)
