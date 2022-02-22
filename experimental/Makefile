@@ -27,8 +27,7 @@ deps/spack:
 
 # Setup the environment
 spack.yaml: deps/spack
-	cp $(CURDIR)/../environments/cscs/spack.yaml $@
-	$(SPACK) -e $(CURDIR) config add 'packages:all:target:[haswell]'
+	cp $(CURDIR)/../environments/daint/spack.yaml $@
 
 # Concretize
 spack.lock: spack.yaml deps/spack
