@@ -20,7 +20,7 @@ fusermount -u "$merge" > /dev/null 2>&1 || true
 
 # First process runs the overlay mount
 if [ "$SLURM_LOCALID" = 0 ] || [ -z "${SLURM_LOCALID+x}" ]; then
-    "$overlayfscmd" -o "auto_unmount,big_writes,max_write=1048576,threaded=0,lowerdir=$lower,upperdir=$upper,workdir=$work" "$merge"
+    "$overlayfscmd" -o "fsync=0,noxattrs=1,xattr_permissions=0,lowerdir=$lower,upperdir=$upper,workdir=$work" "$merge"
 fi
 
 # Other processes wait for it to come into existence

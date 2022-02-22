@@ -37,9 +37,13 @@ spack.lock: spack.yaml deps/spack
 # Spack believes it's installing to UPSTREAM_STORE, but in reality it's installing new
 # packages to `DOWNSTREAM_STORE`.
 build: spack.lock deps/usr/bin/overlayfs
-	mkdir -p $(UPSTREAM_STORE) $(DOWNSTREAM_STORE) work merged
+	# Not sure if really required, but to avoid having to bind mount
+	# the merged dir over the bottom layer, add a level of indirection with a
+	# symlink from $(UPSTREAM_STORE) to $(UPSTREAM_STORE)-current
+	mkdir -p $(UPSTREAM_STORE)-current $(DOWNSTREAM_STORE) work merged
+	ln -s $(UPSTREAM_STORE)-current $(UPSTREAM_STORE) || true
 	$(SRUN_BUILD) \
-		$(OVERLAY_SH) $(OVERLAYFS) $(UPSTREAM_STORE) $(DOWNSTREAM_STORE) $(CURDIR)/work $(CURDIR)/merged \
+		$(OVERLAY_SH) $(OVERLAYFS) $(UPSTREAM_STORE)-current $(DOWNSTREAM_STORE) $(CURDIR)/work $(CURDIR)/merged \
 		$(UNSHARE) -rm \
 			$(BIND_SH) $(CURDIR)/merged $(UPSTREAM_STORE) \
 			$(SPACK) \
