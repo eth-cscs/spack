@@ -2,6 +2,7 @@ spack:
   view: false
   concretization: separately
   specs:
+  - cuda
   - gromacs
   - julia ^llvm ~clang ~compiler-rt ~libcxx ~lld ~lldb ~polly ^libgit2 ~mmap
   - llvm +clang +compiler-rt +libcxx +lld +lldb +omp_as_runtime +polly targets=amdgpu,bpf,nvptx
