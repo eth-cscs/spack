@@ -10,7 +10,7 @@ spack:
       - julia ^llvm ~clang ~compiler-rt ~libcxx ~lld ~lldb ~polly ^libgit2 ~mmap
       - llvm +clang +compiler-rt +cuda +libcxx +lld +lldb +omp_as_runtime +polly targets=amdgpu,bpf,nvptx
       - openmpi +cuda
-      - pika
+      - pika +cuda
       - 'sirius +cuda ^intel-mkl@2020:'
   packages:
     all:
