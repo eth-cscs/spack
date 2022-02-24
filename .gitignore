@@ -4,3 +4,4 @@ good_sha
 env.diff
 **/__pycache__
 generated-configs/
+spack.lock

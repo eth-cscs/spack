@@ -2,16 +2,37 @@ spack:
   view: false
   concretization: separately
   specs:
-  - cuda
-  - gromacs
-  - julia ^llvm ~clang ~compiler-rt ~libcxx ~lld ~lldb ~polly ^libgit2 ~mmap
-  - llvm +clang +compiler-rt +libcxx +lld +lldb +omp_as_runtime +polly targets=amdgpu,bpf,nvptx
-  - pika
-  - sirius
+  - matrix:
+    - - target=broadwell
+      - target=haswell
+    - - cuda
+      - gromacs
+      - julia ^llvm ~clang ~compiler-rt ~libcxx ~lld ~lldb ~polly ^libgit2 ~mmap
+      - llvm +clang +compiler-rt +cuda +libcxx +lld +lldb +omp_as_runtime +polly targets=amdgpu,bpf,nvptx
+      - openmpi +cuda
+      - pika
+      - 'sirius +cuda ^intel-mkl@2020:'
   packages:
     all:
-      target:
-      - broadwell
+      variants: [cuda_arch=60]
+      providers:
+        mpi: [openmpi]
+        blas: [intel-mkl]
+        lapack: [intel-mkl]
+        fftw-api: [intel-mkl]
+        pkgconfig: [pkg-config]
+    openmpi:
+      variants:
+      - +thread_multiple
+      - ~gpfs
+      - ~internal-hwloc
+      - ~lustre
+      - fabrics=auto
+      - schedulers=auto
+    pkg-config:
+      externals:
+      - spec: pkg-config@0.29.2
+        prefix: /usr
   compilers:
   - compiler:
       spec: gcc@11.2.0
