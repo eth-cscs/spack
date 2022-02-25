@@ -29,19 +29,29 @@ deps/spack:
 spack.yaml: deps/spack
 	cp $(CURDIR)/../environments/daint/spack.yaml $@
 
+# Ensure that cray-mpich is in the database so it can use --reuse'd.
+add_cray_mpich: bin/add_cray_mpich.py spack.yaml deps/spack
+	$(SRUN) $(SPACK) \
+		-e $(CURDIR) \
+		-c "config:install_tree:root:$(DOWNSTREAM_STORE)" \
+		python $< && touch "$@"
+
 # Concretize
-spack.lock: spack.yaml deps/spack
-	$(SRUN) $(SPACK) -e $(CURDIR) concretize
+spack.lock: spack.yaml deps/spack add_cray_mpich
+	$(SRUN) $(SPACK) -e $(CURDIR) concretize --reuse
 
 # Distributed build using overlayfs.
 # Spack believes it's installing to UPSTREAM_STORE, but in reality it's installing new
 # packages to `DOWNSTREAM_STORE`.
-build: spack.lock deps/usr/bin/overlayfs
+build: spack.lock deps/usr/bin/overlayfs add_cray_mpich
 	# Not sure if really required, but to avoid having to bind mount
 	# the merged dir over the bottom layer, add a level of indirection with a
 	# symlink from $(UPSTREAM_STORE) to $(UPSTREAM_STORE)-current
-	mkdir -p $(UPSTREAM_STORE)-current $(DOWNSTREAM_STORE) work merged
-	ln -s $(UPSTREAM_STORE)-current $(UPSTREAM_STORE) || true
+	if [ "$$(realpath $(UPSTREAM_STORE)-current)" != "$$(realpath $(UPSTREAM_STORE))" ]; then \
+		echo "Make sure `$(UPSTREAM_STORE)-current` is a symlink to `$(UPSTREAM_STORE)`" \
+		exit 1 \
+	fi
+	mkdir -p $(UPSTREAM_STORE)-current $(UPSTREAM_STORE) $(DOWNSTREAM_STORE) work merged
 	$(SRUN_BUILD) \
 		$(OVERLAY_SH) $(OVERLAYFS) $(UPSTREAM_STORE)-current $(DOWNSTREAM_STORE) $(CURDIR)/work $(CURDIR)/merged \
 		$(UNSHARE) -rm \
@@ -50,8 +60,7 @@ build: spack.lock deps/usr/bin/overlayfs
 				-c "config:install_tree:root:$(UPSTREAM_STORE)" \
 				-c "modules:default:enable::[]" \
 				-e $(dir $<) \
-				install -j32
-	touch "$@"
+				install -j32 && touch "$@"
 
 # Create a layer, including the new database index
 store.tar.zst: exclude.txt build deps/usr/bin/zstd
