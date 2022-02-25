@@ -10,7 +10,7 @@ import spack.environment
 
 for compiler in spack.compilers.all_compilers():
     if compiler.name == 'gcc':
-        spec = Spec('cray-mpich@7.7.18 target=x86_64')
+        spec = Spec('cray-mpich@7.7.18')
         spec.external_path = '/opt/cray/pe/mpt/7.7.18/gni/mpich-gnu'
         spec.compiler = compiler.spec
         spec.concretize()

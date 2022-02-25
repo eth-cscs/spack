@@ -38,7 +38,10 @@ add_cray_mpich: bin/add_cray_mpich.py spack.yaml deps/spack
 
 # Concretize
 spack.lock: spack.yaml deps/spack add_cray_mpich
-	$(SRUN) $(SPACK) -e $(CURDIR) concretize --reuse
+	$(SRUN) $(SPACK) \
+		-e $(CURDIR) \
+		-c "config:install_tree:root:$(DOWNSTREAM_STORE)" \
+		concretize --reuse
 
 # Distributed build using overlayfs.
 # Spack believes it's installing to UPSTREAM_STORE, but in reality it's installing new
