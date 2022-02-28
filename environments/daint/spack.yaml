@@ -10,11 +10,49 @@ spack:
       - llvm +clang +compiler-rt +cuda +libcxx +lld +lldb +omp_as_runtime +polly targets=amdgpu,bpf,nvptx
       - pika +cuda
       - sirius +cuda
+      - openmpi +cuda
   packages:
     all:
       variants: [cuda_arch=60]
       providers:
-        mpi: [cray-mpich]
+        mpi: [openmpi]
+        blas: [openblas]
+        lapack: [openblas]
+        fftw-api: [fftw]
+        pkgconfig: [pkg-config]
+  packages:
+    autoconf:
+      externals:
+      - spec: autoconf@2.69
+        prefix: /usr
+    automake:
+      externals:
+      - spec: automake@1.15.1
+        prefix: /usr
+    libtool:
+      externals:
+      - spec: libtool@2.4.6
+        prefix: /usr
+    m4:
+      externals:
+      - spec: m4@1.4.18
+        prefix: /usr
+    openmpi:
+      variants:
+      - +thread_multiple
+      - ~gpfs
+      - ~internal-hwloc
+      - ~lustre
+      - fabrics=auto
+      - schedulers=auto
+    perl:
+      externals:
+      - spec: perl@5.26.1~cpanm+shared+threads
+        prefix: /usr
+    pkg-config:
+      externals:
+      - spec: pkg-config@0.29.2
+        prefix: /usr
   'compilers:':
   - compiler:
       spec: gcc@11.2.0

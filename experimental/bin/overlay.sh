@@ -30,6 +30,6 @@ done
 
 # Execute the actual command
 
-env --chdir="$PWD" "$@"
+"$@"
 
 fusermount -u "$merge" > /dev/null 2>&1 || true
