@@ -20,7 +20,6 @@ spack:
         lapack: [openblas]
         fftw-api: [fftw]
         pkgconfig: [pkg-config]
-  packages:
     autoconf:
       externals:
       - spec: autoconf@2.69
