@@ -5,6 +5,7 @@ of installed packages.
 - Linux 4.18+
 - `fusermount`
 - `unshare`
+- `bwrap`
 
 ## Usage
 
