@@ -44,7 +44,7 @@ build: spack.lock deps/usr/bin/overlayfs
 	# the merged dir over the bottom layer, add a level of indirection with a
 	# symlink from $(UPSTREAM_STORE) to $(UPSTREAM_STORE)-current
 	if [ "$$(realpath $(UPSTREAM_STORE)-current)" != "$$(realpath $(UPSTREAM_STORE))" ]; then \
-		echo "Make sure `$(UPSTREAM_STORE)-current` is a symlink to `$(UPSTREAM_STORE)`" \
+		echo 'Make sure `$(UPSTREAM_STORE)-current` is a symlink to `$(UPSTREAM_STORE)`' \
 		exit 1 \
 	fi
 	mkdir -p $(UPSTREAM_STORE)-current $(UPSTREAM_STORE) $(DOWNSTREAM_STORE) work merged
