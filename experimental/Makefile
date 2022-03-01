@@ -34,7 +34,7 @@ spack.lock: spack.yaml deps/spack
 	$(SRUN) $(SPACK) \
 		-e $(CURDIR) \
 		-c "config:install_tree:root:$(DOWNSTREAM_STORE)" \
-		concretize --reuse
+		concretize -f
 
 # Distributed build using overlayfs.
 # Spack believes it's installing to UPSTREAM_STORE, but in reality it's installing new
@@ -55,7 +55,7 @@ build: spack.lock deps/usr/bin/overlayfs
 				-c "config:install_tree:root:$(UPSTREAM_STORE)" \
 				-c "modules:default:enable::[]" \
 				-e $(CURDIR) \
-				install -j32 && touch "$@"
+				install -j72 && touch "$@"
 
 # Create a layer, including the new database index
 store.tar.zst: exclude.txt build deps/usr/bin/zstd

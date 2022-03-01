@@ -8,7 +8,7 @@ DOWNSTREAM_STORE:=$(CURDIR)/store
 SRUN:=srun --pty -Ajenscscs -Cmc -N1
 
 # `srun` command for distributed builds
-SRUN_BUILD:=$(SRUN) -n8 -c32 --overcommit --oversubscribe
+SRUN_BUILD:=$(SRUN) -n8 -c72 --overcommit --oversubscribe
 
 GIT:=git
 CURL:=curl
